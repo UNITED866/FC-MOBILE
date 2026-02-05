@@ -6,6 +6,24 @@
 <title>HỆ THỐNG LẤY KEY</title>
 
 <style>
+/* ===== NOTICE ===== */
+.notice-box{
+  margin-top:14px;
+  padding:14px;
+  border-radius:14px;
+  background:#000;
+  border:1px solid #00ff9c;
+  box-shadow:0 0 18px rgba(0,255,156,.35);
+  font-size:14px;
+  line-height:1.5;
+  animation:fadeIn .4s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
 *{
   margin:0;
   padding:0;
@@ -184,6 +202,14 @@ button:active{
   <select class="select"><option>Reset 00:00 Mỗi Ngày</option></select>
 
   <button id="getKey">🔑 Lấy Key</button>
+
+<!-- THÔNG BÁO -->
+<div class="notice-box" id="noticeBox">
+  <b>📌 Hướng dẫn nhanh</b><br>
+  Nhấn nút "🔑 Lấy Key".<br>
+  Vượt link theo số bước quy định.<br>
+  Key sẽ hiện ra tại trang kích hoạt.
+</div>
 
   <!-- DOWNLOAD 64BIT -->
   <div class="download-box">
