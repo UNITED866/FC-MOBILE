@@ -3,331 +3,211 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HỆ THỐNG LẤY KEY</title>
+<title>Nhận key miễn phí</title>
 
 <style>
-/* ===== GROUP BOX ===== */
-.group-box{
-  margin-top:14px;
-  padding:14px;
-  border-radius:14px;
-  background:#000;
-  border:1px solid #00ff9c;
-  box-shadow:0 0 18px rgba(0,255,156,.35);
-  font-size:14px;
-  line-height:1.5;
+.game-item{
+    cursor:pointer;
+    transition:0.2s;
 }
 
-.group-box span{
-  display:block;
-  font-size:13px;
-  opacity:.85;
-  margin-top:4px;
+.game-item.active{
+    background:#2f6f68;
+    color:#fff;
 }
 
-.group-actions{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
-
-.group-btn{
-  flex:1;
-  text-align:center;
-  padding:10px;
-  border-radius:10px;
-  font-weight:bold;
-  text-decoration:none;
-  color:#000;
-}
-
-.group-btn.chat{
-  background:linear-gradient(90deg,#00ff9c,#00cc88);
-}
-
-.group-btn.notify{
-  background:linear-gradient(90deg,#00c3ff,#3cc7ff);
-}
-
-.group-btn:active{
-  transform:scale(.96);
-}
-
-/* ===== NOTICE ===== */
-.notice-box{
-  margin-top:14px;
-  padding:14px;
-  border-radius:14px;
-  background:#000;
-  border:1px solid #00ff9c;
-  box-shadow:0 0 18px rgba(0,255,156,.35);
-  font-size:14px;
-  line-height:1.5;
-  animation:fadeIn .4s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(8px)}
-  to{opacity:1;transform:translateY(0)}
+.game-item.active span{
+    color:#e0fffa;
 }
 
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial,Helvetica,sans-serif;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-
 body{
-  background:radial-gradient(circle at top,#0e2a23,#050807);
-  color:#00ff9c;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+    margin:0;
+    background:#f4f2ee;
+    padding:15px;
 }
 
-.container{
-  width:94%;
-  max-width:420px;
-  background:#071512;
-  border:2px solid #00ff9c;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 0 30px rgba(0,255,156,.45);
+/* Card */
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:16px;
+    margin-bottom:15px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
 }
 
+/* Title */
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:#e6f3f1;
+    color:#2c7f75;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
 h1{
-  text-align:center;
-  margin-bottom:6px;
+    margin:10px 0 6px;
+    font-size:22px;
+}
+.sub{
+    color:#666;
+    font-size:14px;
 }
 
-.time{
-  text-align:center;
-  font-size:14px;
-  opacity:.85;
-  margin-bottom:14px;
+/* Search */
+.search{
+    margin:15px 0;
+}
+.search input{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid #ddd;
+    font-size:14px;
 }
 
-.select{
-  width:100%;
-  margin-bottom:10px;
-  padding:12px;
-  background:#000;
-  color:#00ff9c;
-  border:1px solid #00ff9c;
-  border-radius:8px;
+/* Game list */
+.game{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#f8f7f4;
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:10px;
+    font-weight:600;
+}
+.game span{
+    color:#888;
+    font-weight:500;
+    font-size:13px;
 }
 
-button{
-  width:100%;
-  padding:14px;
-  background:#00ff9c;
-  color:#000;
-  font-size:17px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
+/* Buttons */
+.btn-main{
+    width:100%;
+    background:#2f6f68;
+    color:#fff;
+    border:none;
+    padding:14px;
+    border-radius:16px;
+    font-size:16px;
+    font-weight:700;
+    margin-top:10px;
+}
+.btn{
+    width:100%;
+    background:#fff;
+    border:2px solid #2f6f68;
+    color:#2f6f68;
+    padding:12px;
+    border-radius:16px;
+    font-size:15px;
+    font-weight:700;
+    margin-top:10px;
 }
 
-button:active{
-  transform:scale(.97);
+/* Info row */
+.info{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+    flex-wrap:wrap;
+}
+.info div{
+    background:#f0efec;
+    padding:6px 10px;
+    border-radius:10px;
+    font-size:13px;
 }
 
-/* ===== DOWNLOAD BOX ===== */
-.download-box{
-  margin-top:18px;
-  display:flex;
-  gap:14px;
-  padding:14px;
-  border-radius:16px;
-  background:#000;
-  border:1px solid #00ff9c;
-  box-shadow:0 0 20px rgba(0,255,156,.4);
+/* Guide */
+.guide h3{
+    margin-top:0;
 }
-
-.download-left img{
-  width:92px;
-  height:92px;
-  border-radius:12px;
-  object-fit:cover;
+.guide ol{
+    padding-left:18px;
+    color:#555;
 }
-
-.download-right{
-  flex:1;
-}
-
-.download-right h3{
-  margin-bottom:4px;
-}
-
-.download-right p{
-  font-size:13px;
-  opacity:.75;
-}
-
-.download-btn{
-  display:inline-block;
-  margin-top:8px;
-  padding:10px 14px;
-  border-radius:10px;
-  background:linear-gradient(90deg,#00ff9c,#00c3ff);
-  color:#000;
-  font-weight:bold;
-  text-decoration:none;
-}
-
-/* ===== POPUP ===== */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-.popup{
-  width:85%;
-  max-width:340px;
-  background:#2b2b2b;
-  border-radius:16px;
-  padding:hpx;
-  text-align:center;
-}
-
-.icon{
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  border:3px solid #3cc7ff;
-  color:#3cc7ff;
-  font-size:34px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:auto;
-}
-
-.popup h2{
-  color:#fff;
-  margin:12px 0 8px;
-}
-
-.popup p{
-  color:#ccc;
-  font-size:14px;
-}
-
-.loader{
-  width:36px;
-  height:36px;
-  border:4px solid #444;
-  border-top:4px solid #3cc7ff;
-  border-radius:50%;
-  margin:18px auto 0;
-  animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg);}
+.telegram{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    color:#2f6f68;
+    font-weight:600;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>HỆ THỐNG LẤY KEY</h1>
-  <div class="time" id="time"></div>
+<div class="card">
+    <div class="badge">⚡ KEY MIỄN PHÍ</div>
+    <h1>Nhận key miễn phí</h1>
+    <div class="sub"></div>
 
-  <select class="select"><option>Việt Nam & Quốc Tế</option></select>
-  <select class="select"><option>FC VN & FC QT</option></select>
-  <select class="select"><option>1 Thiết bị</option></select>
-  <select class="select"><option>Reset 00:00 Mỗi Ngày</option></select>
+    <div class="game game-item">FC MOBILE <span>— FCMOBILE</span></div>
 
-  <button id="getKey">🔑 Lấy Key</button>
+    <button class="btn-main" onclick="goFreeKey()">Nhận key miễn phí</button>
+    <button class="btn" onclick="goIB()">FC MOBILE VN</button>
+    <button class="btn" onclick="goAuto()">FC MOBILE QUỐC TẾ</button>
 
-<!-- THÔNG BÁO -->
-<div class="notice-box" id="noticeBox">
-  <b>📌 Hướng dẫn nhanh</b><br>
-  Nhấn nút "🔑 Lấy Key".<br>
-  Vượt link theo số bước quy định.<br>
-  Key sẽ hiện ra tại trang kích hoạt.
+    <div class="info">
+        <div>Số lần vượt link: 3 lần</div>
+        <div>Thời hạn key: 1 ngày</div>
+        <div>Thiết bị: 1</div>
+    </div>
 </div>
 
-<!-- THAM GIA NHÓM -->
-<div class="group-box">
-  <b>💬 Tham gia cộng đồng</b><br>
-  <span>Nhận thông báo key mới & hỗ trợ nhanh</span>
+<div class="card guide">
+    <h3>Hướng dẫn nhanh</h3>
+    <ol>
+        <li>Chọn đúng game bạn muốn nhận key.</li>
+        <li>Nhấn nút <b>"Nhận key miễn phí"</b>.</li>
+        <li>Vượt link theo số bước quy định.</li>
+        <li>Key sẽ hiện ra tại trang kích hoạt.</li>
+    </ol>
 
-  <div class="group-actions">
-    <a href="https://t.me/vhmodsgame" target="_blank" class="group-btn chat">
-      💬 Nhóm Chat
-    </a>
-    <a href="https://t.me/vhmodsgames" target="_blank" class="group-btn notify">
-      📢 Nhóm Thông Báo
-    </a>
-  </div>
+    <div class="telegram">
+        📩 Hỗ trợ nhanh qua Telegram
+    </div>
+    <div class="sub">
+        Nếu gặp lỗi, hãy chụp màn hình và gửi về admin để được xử lý nhanh.
+    </div>
 </div>
-
-  <!-- DOWNLOAD 64BIT -->
-  <div class="download-box">
-    <div class="download-left">
-      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi4lvWE7EC8KYsXn2g7gNhSo_SsXz6LTh1GbXmfWzKNWEeB45FUXXhAEW8hvnpjtkYL_BI-HX_6Hf1k6b8-Vk5QaafXmIAwwX9ngLKSs1qVZG9vMnCx-5yWb8dPeKR9ZGB6Z8RXUwCBwOqg5NiNeCtfvKZ7bu_O99S_R3GZ8-9ZqCJ6la3adsSSQoi1GTI/s447/1000026576.jpg">
-    </div>
-    <div class="download-right">
-      <h3>FC MOBILE VN (Gà Đang Quét)</h3>
-      <p>Nhấn nút bên dưới để tải file</p>
-      <a class="download-btn" href=https://link4m.com/8qbcQoU " target="_blank">⬇️ TẢI NGAY</a>
-    </div>
-  </div>
-
-  <!-- DOWNLOAD 32BIT -->
-  <div class="download-box">
-    <div class="download-left">
-      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiSWyuqUVWKiaypeueDFYno80NXJo51mdHrMaVF-HtM9zbkr1ZO1-ObS5tT_Fuqx_alfz8ua4zvFQ6RPN5ph09WEtnbXI6NwO4SwXTGhJ0dhq0K-WbKTjZ6O2esnbC3oxaSl2pU5xL8YzR7G7LUfASL6ZvyXOJyhhgaTm75T_Ewnu8VwSkAhv5RVHqzubQ/s225/1000026575.jpg">
-    </div>
-    <div class="download-right">
-      <h3>FC MOBILE Quốc Tế</h3>
-      <p>Nhấn nút bên dưới để tải file</p>
-      <a class="download-btn" href=https://link4m.com/Wkr5Wr " target="_blank">⬇️ TẢI NGAY</a>
-    </div>
-  </div>
-
-</div>
-
-<!-- POPUP -->
-<div class="overlay" id="overlay">
-  <div class="popup">
-    <div class="icon">i</div>
-    <h2>Đang xử lý...</h2>
-    <p>Hệ thống đang tạo key và sẽ chuyển hướng sau vài giây, vui lòng chờ.</p>
-    <div class="loader"></div>
-  </div>
-</div>
-
-<script>
-// TIME REAL
-function updateTime(){
-  const n=new Date();
-  document.getElementById("time").innerText=
-  `(${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}
-  ${String(n.getDate()).padStart(2,'0')}/${String(n.getMonth()+1).padStart(2,'0')}/${n.getFullYear()})`;
-}
-updateTime();
-setInterval(updateTime,1000);
-
-// GET KEY
-document.getElementById("getKey").onclick=()=>{
-  document.getElementById("overlay").style.display="flex";
-  setTimeout(()=>{
-    window.location.href="https://vuotnhanh.com/Mr0X";
-  },10000);
-};
-</script>
 
 </body>
+
+<script>
+const games = document.querySelectorAll('.game-item');
+
+games.forEach(game => {
+    game.addEventListener('click', () => {
+        games.forEach(g => g.classList.remove('active'));
+        game.classList.add('active');
+    });
+});
+</script>
+
+<script>
+function goFreeKey(){
+    window.location.href = "https://vuotnhanh.com/xyoD";
+}
+
+function goIB(){
+    window.location.href = "https://link4m.com/8qbcQoU";
+}
+
+function goAuto(){
+    window.location.href = "https://link4m.com/Wkr5Wr";
+}
+</script>
+
 </html>
