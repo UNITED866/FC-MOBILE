@@ -28,16 +28,57 @@
         .lixi::after { content: '福'; } 
         @keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0.2; } }
 
-        /* --- AUTH SCREEN --- */
+        /* --- AUTH SCREEN VỚI VIỀN GRADIENT --- */
         #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--dark-auth); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s ease; }
-        .auth-card { background: #121212; border-radius: 30px; padding: 40px 20px; width: 85%; max-width: 350px; text-align: center; border: 1px solid #333; }
+        
+        .auth-card-wrapper {
+            position: relative;
+            padding: 3px; /* Độ dày của viền */
+            background: linear-gradient(45deg, #ff0000, #ffcc00, #00ff88, #2481cc, #ff0000);
+            background-size: 400%;
+            border-radius: 33px;
+            animation: borderRotate 5s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .auth-card { 
+            background: #121212; 
+            border-radius: 30px; 
+            padding: 40px 20px; 
+            width: 320px; 
+            text-align: center; 
+            border: none;
+        }
+
         .circle-loader { width: 50px; height: 50px; border: 4px solid #1a1a1a; border-top: 4px solid var(--success); border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- MODAL THÔNG BÁO --- */
+        #notice-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 20000; }
+        .modal-content { background: white; width: 90%; max-width: 360px; border-radius: 20px; overflow: hidden; animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 15px; border-bottom: 1px solid #f0f0f0; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 16px; color: #333; }
+        .modal-body { padding: 20px; text-align: center; }
+        .gold-hours { background: #fff5f5; border-radius: 50px; padding: 6px 15px; display: inline-flex; align-items: center; gap: 8px; color: #ff4d4d; font-weight: bold; font-size: 12px; margin-bottom: 15px; border: 1px solid #ffebeb; }
+        .info-red-box { background: #fff5f5; border: 1px dashed #ff4d4d; padding: 12px; margin: 15px 0; color: #d40000; font-size: 11px; font-weight: bold; line-height: 1.5; border-radius: 10px; }
+        .btn-close-modal { background: #ff4d4d; color: white; border: none; padding: 14px; width: 85%; margin: 0 auto 20px auto; cursor: pointer; font-weight: bold; border-radius: 12px; display: block; font-size: 14px; }
+
+        /* --- BACKGROUND TẾT --- */
+        .tet-bg { 
+            background-color: #d40000 !important; 
+            background-image: url("https://www.transparenttextures.com/patterns/pinstripe.png"), linear-gradient(135deg, #d40000 0%, #8b0000 100%) !important;
+            background-attachment: fixed;
+        }
 
         /* --- MAIN CONTENT --- */
         #main-content { display: none; height: 100vh; overflow-y: auto; flex-direction: column; align-items: center; padding: 20px; position: relative; z-index: 10; }
         .container { width: 100%; max-width: 450px; }
-        .card { background: var(--white); border-radius: 25px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: center; border: 1px solid rgba(0,0,0,0.02); }
+        .card { background: var(--white); border-radius: 25px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.3); }
         
         .section-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #333; }
         .clock-container { background: var(--accent); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-weight: bold; font-size: 13px; margin-bottom: 15px; display: inline-block; }
@@ -50,31 +91,47 @@
         .btn-main { background: var(--primary); color: white; }
         .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
 
-        /* --- KHUNG TẢI GAME --- */
+        /* --- DOWNLOAD ITEMS --- */
         .download-grid { display: grid; grid-template-columns: 1fr; gap: 10px; text-align: left; }
         .dl-item { background: #f9f9f9; padding: 12px 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #444; border: 1px solid #eee; transition: 0.3s; }
-        .dl-item:hover { background: var(--accent); border-color: var(--primary); transform: translateX(5px); }
         .dl-info { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
-        .dl-info i.game-icon { color: var(--primary); font-size: 16px; }
-        
-        /* Badge mới với icon download thay dấu ngoặc */
         .dl-badge { font-size: 10px; background: #eee; padding: 3px 8px; border-radius: 6px; color: #555; display: flex; align-items: center; gap: 4px; border: 1px solid #ddd; }
-        .dl-badge i { font-size: 9px; color: var(--primary); }
-
+        
         .tele-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .tele-box { background: #eef7ff; border: 1px solid #cce5ff; padding: 12px; border-radius: 15px; text-align: center; text-decoration: none; color: var(--tele-color); font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
     </style>
 </head>
-<body onclick="playMusic()">
+<body>
 
     <div id="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg"></span></div>
     <div id="lixiBox"></div>
 
     <div id="auth-screen">
-        <div class="auth-card">
-            <div class="circle-loader"></div>
-            <h2 style="color: white; font-size: 18px;">Good Boy</h2>
-            <button class="btn btn-main" style="background:white; color:black; margin-top:20px;" onclick="enterMain()">TRUY CẬP</button>
+        <div class="auth-card-wrapper">
+            <div class="auth-card">
+                <div class="circle-loader"></div>
+                <h2 style="color: white; font-size: 18px;">Good Boy</h2>
+                <button class="btn btn-main" style="background:white; color:black; margin-top:20px; border-radius: 15px;" onclick="openNotice()">TRUY CẬP</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notice-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-bell" style="color: #f1c40f;"></i> Thông Báo
+            </div>
+            <div class="modal-body">
+                <div class="gold-hours">
+                    <i class="fas fa-fire"></i> THỜI GIAN KEY <span style="font-weight:normal; margin-left:5px;">🕒 RESET 00 GIỜ MỖI NGÀY</span>
+                </div>
+                <div style="font-size: 14px; margin-bottom: 5px; color: #333;">Hoàn thành nhiệm vụ để nhận key</div>
+                <div class="info-red-box">
+                    ⚠️ 1 KEY & 1 MÁY<br>
+                    <span style="font-weight:normal;">VanHiep Đẹp Trai</span>
+                </div>
+            </div>
+            <button class="btn-close-modal" onclick="enterMain()">ĐÃ HIỂU</button>
         </div>
     </div>
 
@@ -101,45 +158,28 @@
                 <div class="section-title"><i class="fas fa-download"></i> TẢI GAME MOD MENU KISS</div>
                 <div class="download-grid">
                     <a href="https://vuotnhanh.com/XLpK" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-gamepad game-icon"></i> FC MOBILE 
-                            <span class="dl-badge"><i class="fas fa-download"></i> QUỐC TẾ</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-gamepad"></i> FC MOBILE <span class="dl-badge">QUỐC TẾ</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
                     </a>
                     <a href="https://vuotnhanh.com/AFuP" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-gamepad game-icon"></i> FC MOBILE 
-                            <span class="dl-badge"><i class="fas fa-download"></i> VIỆT NAM</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-gamepad"></i> FC MOBILE <span class="dl-badge">VIỆT NAM</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
                     </a>
                     <a href="https://vuotnhanh.com/7UsH" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-shield-alt game-icon"></i> LIÊN QUÂN 
-                            <span class="dl-badge"><i class="fas fa-download"></i> 64 BIT</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-shield-alt"></i> LIÊN QUÂN <span class="dl-badge">64 BIT</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
                     </a>
                     <a href="https://vuotnhanh.com/q8gd" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-shield-alt game-icon"></i> LIÊN QUÂN 
-                            <span class="dl-badge"><i class="fas fa-download"></i> 32 BIT</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-shield-alt"></i> LIÊN QUÂN <span class="dl-badge">32 BIT</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
                     </a>
                     <a href="https://vuotnhanh.com/lw8g" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-shield-alt game-icon"></i> LIÊN QUÂN IOS
-                            <span class="dl-badge"><i class="fas fa-download"></i> IOS </span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-shield-alt"></i> LIÊN QUÂN IOS <span class="dl-badge">IOS</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
+                    </a>
                     <a href="https://vuotnhanh.com/oxVm" class="dl-item" target="_blank">
-                        <div class="dl-info">
-                            <i class="fas fa-circle game-icon"></i> 8 BALL POOL 
-                            <span class="dl-badge"><i class="fas fa-download"></i> VIP</span>
-                        </div>
-                        <i class="fas fa-chevron-right" style="font-size: 12px; color: #ccc;"></i>
+                        <div class="dl-info"><i class="fas fa-circle"></i> 8 BALL POOL <span class="dl-badge">VIP</span></div>
+                        <i class="fas fa-chevron-right" style="color:#ccc"></i>
                     </a>
                 </div>
             </div>
@@ -150,11 +190,28 @@
                     <a href="https://t.me/vhmodsgamechat" class="tele-box" target="_blank"><i class="fab fa-telegram"></i> Nhóm Chat</a>
                 </div>
             </div>
-            <footer style="color: #999; font-size: 11px; text-align: center; margin-bottom: 20px;">Powered by <strong>VanHiep</strong></footer>
+            <footer style="color: #eee; font-size: 11px; text-align: center; margin-bottom: 20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Powered by <strong>VanHiep</strong></footer>
         </div>
     </div>
 
     <script>
+        const audio = document.getElementById("bgMusic");
+
+        function openNotice() {
+            document.getElementById('auth-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('notice-modal').style.display = 'flex';
+            }, 500);
+        }
+
+        function enterMain() {
+            document.getElementById('notice-modal').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.body.classList.add('tet-bg');
+            audio.play().catch(() => {});
+        }
+
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
@@ -164,7 +221,7 @@
 
         function updateTime() {
             const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0') + ":" + now.getSeconds().toString().padStart(2,'0') + " - " + now.getDate().toString().padStart(2,'0') + "/" + (now.getMonth()+1).toString().padStart(2,'0') + "/" + now.getFullYear();
+            const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0') + ":" + now.getSeconds().toString().padStart(2,'0');
             document.getElementById('realTime').innerHTML = `<i class="fas fa-clock"></i> ${timeStr}`;
         }
         setInterval(updateTime, 1000);
@@ -179,16 +236,6 @@
             setTimeout(() => l.remove(), 6000);
         }
         setInterval(createLixi, 500);
-
-        const audio = document.getElementById("bgMusic");
-        function enterMain() {
-            document.getElementById('auth-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                audio.play().catch(() => {});
-            }, 500);
-        }
 
         let currentSelected = "";
         const gameLinks = { "FC MOBILE": "https://vuotnhanh.com/Y6K4", "LIÊN QUÂN": "https://vuotnhanh.com/eurg", "LIÊN QUÂN IOS": "https://link4m.com/0QdlYwL4", "8 BALL POOL": "https://link4m.com/go/ZK8vJff" };
