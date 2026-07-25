@@ -954,6 +954,45 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
+        // Lấy IP công khai của khách qua dịch vụ ngoài (trình duyệt không tự đọc được IP).
+        // Có timeout để không làm treo trang nếu dịch vụ lỗi/chậm.
+        async function getVisitorIp() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const res = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
+                clearTimeout(timeoutId);
+                const data = await res.json();
+                return data.ip || null;
+            } catch (e) {
+                console.error("Không lấy được IP khách:", e);
+                return null;
+            }
+        }
+
+        // Ghi nhận 1 lượt xem — chống đếm trùng: mỗi IP chỉ tính 1 lượt/ngày.
+        // Nếu vì lý do gì không lấy được IP, vẫn cộng lượt như bình thường để không mất dữ liệu.
+        async function recordVisit() {
+            const today = todayKey();
+            try {
+                const ip = await getVisitorIp();
+                if (!ip) {
+                    await update(ref(db, "stats/visits"), { [today]: increment(1) });
+                    return;
+                }
+                const safeIp = ip.replace(/[.:]/g, "_");
+                const logRef = ref(db, `stats/visitorLog/${today}/${safeIp}`);
+                const snap = await get(logRef);
+                if (!snap.exists()) {
+                    await set(logRef, true);
+                    await update(ref(db, "stats/visits"), { [today]: increment(1) });
+                }
+                // IP này đã được tính hôm nay rồi -> không cộng thêm
+            } catch (e) {
+                console.error("Lỗi ghi lượt truy cập", e);
+            }
+        }
+
         // ---- Áp dụng link Get Key / Tải / Ảnh đã lưu (nếu có) khi tải trang ----
         // Tải song song (Promise.all) thay vì tuần tự để nhanh hơn và tránh bấm quá sớm khi chưa kịp load
         async function loadGameLinksIntoPage() {
@@ -1193,9 +1232,7 @@
             music.volume = 0.5;
             music.play().catch(err => console.log("Không thể tự phát nhạc:", err));
 
-            try {
-                await update(ref(db, `stats/visits`), { [todayKey()]: increment(1) });
-            } catch (e) { console.error("Lỗi ghi lượt truy cập", e); }
+            recordVisit();
         });
 
         // ---- Avatar 5-tap -> mở modal mật khẩu admin ----
