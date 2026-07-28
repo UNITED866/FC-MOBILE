@@ -429,14 +429,19 @@
   const ADMIN_PASSWORD = 'doimatkhaunay';
 
   // ====== FIREBASE REST HELPERS ======
+  function noCacheUrl(path) {
+    return DB_URL + '/' + path + '.json?_=' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+  }
+
   async function fbGet(path) {
-    const res = await fetch(DB_URL + '/' + path + '.json');
+    const res = await fetch(noCacheUrl(path), { cache: 'no-store' });
     if (!res.ok) throw new Error('Không đọc được dữ liệu (' + res.status + ')');
     return res.json();
   }
 
   async function fbGetWithEtag(path) {
-    const res = await fetch(DB_URL + '/' + path + '.json', {
+    const res = await fetch(noCacheUrl(path), {
+      cache: 'no-store',
       headers: { 'X-Firebase-ETag': 'true' }
     });
     if (!res.ok) throw new Error('Không đọc được dữ liệu (' + res.status + ')');
@@ -449,6 +454,7 @@
   async function fbPut(path, value) {
     const res = await fetch(DB_URL + '/' + path + '.json', {
       method: 'PUT',
+      cache: 'no-store',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(value)
     });
@@ -459,6 +465,7 @@
   async function fbPutConditional(path, value, etag) {
     const res = await fetch(DB_URL + '/' + path + '.json', {
       method: 'PUT',
+      cache: 'no-store',
       headers: { 'Content-Type': 'application/json', 'if-match': etag },
       body: JSON.stringify(value)
     });
@@ -466,13 +473,14 @@
   }
 
   async function fbDelete(path) {
-    const res = await fetch(DB_URL + '/' + path + '.json', { method: 'DELETE' });
+    const res = await fetch(DB_URL + '/' + path + '.json', { method: 'DELETE', cache: 'no-store' });
     if (!res.ok) throw new Error('Không xoá được dữ liệu (' + res.status + ')');
   }
 
   async function fbPatch(path, value) {
     const res = await fetch(DB_URL + '/' + path + '.json', {
       method: 'PATCH',
+      cache: 'no-store',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(value)
     });
