@@ -287,6 +287,60 @@
 
   hr.sep { border: none; border-top: 1px solid rgba(255,255,255,0.12); margin: 22px 0 18px; }
 
+  .link-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .link-row-admin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-wrap: wrap;
+  }
+  .link-row-admin:last-child { border-bottom: none; }
+  .link-idx {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-softer);
+    min-width: 36px;
+  }
+  .link-url-input {
+    flex: 1 1 160px;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    padding: 7px 9px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text);
+  }
+  .link-status {
+    font-size: 0.66rem;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+  .link-status.used { color: var(--gold); }
+  .link-status.free { color: var(--cyan); }
+  .link-row-actions { display: flex; gap: 6px; }
+  .link-row-actions button {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    width: auto;
+  }
+  .save-link-btn { background: var(--cyan); color: #06060d; }
+  .delete-link-btn { background: var(--danger); color: #fff; }
+
   @media (max-width: 420px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
 
   @media (prefers-reduced-motion: reduce) {
@@ -348,10 +402,15 @@
         </div>
 
         <div class="admin-box">
-          <label for="linksInput">Danh sách link (mỗi dòng một link)</label>
-          <textarea id="linksInput" rows="10" placeholder="https://vidu.com/link-1&#10;https://vidu.com/link-2&#10;..."></textarea>
-          <button id="initLinksBtn" type="button">Khởi tạo kho rương mới</button>
-          <p class="admin-hint">Thao tác này xoá toàn bộ rương và lượt nhận cũ, sau đó tạo lại từ danh sách trên.</p>
+          <label for="addLinksInput">Thêm link mới (mỗi dòng một link — cộng dồn vào kho hiện có, không xoá link cũ)</label>
+          <textarea id="addLinksInput" rows="5" placeholder="https://vidu.com/link-moi-1&#10;https://vidu.com/link-moi-2&#10;..."></textarea>
+          <button id="addLinksBtn" type="button">➕ Thêm Vào Kho</button>
+        </div>
+
+        <div class="admin-box">
+          <label>Danh sách rương hiện có (bấm vào ô link để sửa, rồi bấm Lưu)</label>
+          <div id="linkListContainer" class="link-list"><p class="admin-hint">Bấm "Tải lại danh sách" để xem.</p></div>
+          <button id="refreshListBtn" type="button">🔄 Tải Lại Danh Sách</button>
         </div>
 
         <hr class="sep">
@@ -411,6 +470,16 @@
     if (!res.ok) throw new Error('Không xoá được dữ liệu (' + res.status + ')');
   }
 
+  async function fbPatch(path, value) {
+    const res = await fetch(DB_URL + '/' + path + '.json', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(value)
+    });
+    if (!res.ok) throw new Error('Không cập nhật được dữ liệu (' + res.status + ')');
+    return res.json();
+  }
+
   // ====== TIỆN ÍCH ======
   function getVNDateKey() {
     return new Intl.DateTimeFormat('en-CA', {
@@ -421,6 +490,11 @@
 
   function sanitizeIpKey(ip) {
     return String(ip).replace(/[.#$\[\]\/]/g, '_');
+  }
+
+  function displayIpKey(ipKey) {
+    // Chỉ để hiển thị cho admin: đổi dấu "_" (được thay cho dấu "." khi lưu) về lại dạng IP dễ đọc.
+    return String(ipKey).replace(/_/g, '.');
   }
 
   async function getClientIP() {
@@ -483,7 +557,7 @@
         const linkPath = 'linkPool/' + tryKey;
         const linkRes = await fbGetWithEtag(linkPath);
         if (linkRes.data && linkRes.data.used === false) {
-          const ok = await fbPutConditional(linkPath, { url: linkRes.data.url, used: true }, linkRes.etag);
+          const ok = await fbPutConditional(linkPath, { url: linkRes.data.url, used: true, claimedByIp: ipKey, claimedAt: Date.now() }, linkRes.etag);
           if (ok) { assignedUrl = linkRes.data.url; assignedKey = tryKey; break; }
         }
         candidates.splice(idx, 1);
@@ -654,6 +728,46 @@
     checkExistingClaimOnLoad();
   }
 
+  function linkIndexOf(key) {
+    const n = parseInt(String(key).replace(/^l/, ''), 10);
+    return isNaN(n) ? -1 : n;
+  }
+
+  function linkRowHtml(key, data) {
+    const idx = linkIndexOf(key);
+    const idxLabel = idx >= 0 ? String(idx + 1).padStart(3, '0') : '?';
+    const statusHtml = data.used
+      ? '<span class="link-status used">Đã phát' + (data.claimedByIp ? ' · IP ' + escapeHtml(displayIpKey(data.claimedByIp)) : '') + '</span>'
+      : '<span class="link-status free">Còn trống</span>';
+    return (
+      '<div class="link-row-admin" data-key="' + escapeHtml(key) + '">' +
+        '<span class="link-idx">#' + idxLabel + '</span>' +
+        '<input type="text" class="link-url-input" value="' + escapeHtml(data.url || '') + '">' +
+        statusHtml +
+        '<div class="link-row-actions">' +
+          '<button class="save-link-btn" type="button">Lưu</button>' +
+          '<button class="delete-link-btn" type="button">Xoá</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  async function loadLinkList() {
+    const container = document.getElementById('linkListContainer');
+    container.innerHTML = '<p class="admin-hint">Đang tải…</p>';
+    try {
+      const pool = (await fbGet('linkPool')) || {};
+      const keys = Object.keys(pool).sort(function (a, b) { return linkIndexOf(a) - linkIndexOf(b); });
+      if (keys.length === 0) {
+        container.innerHTML = '<p class="admin-hint">Chưa có rương nào. Thêm link ở ô phía trên để bắt đầu.</p>';
+        return;
+      }
+      container.innerHTML = keys.map(function (k) { return linkRowHtml(k, pool[k] || {}); }).join('');
+    } catch (e) {
+      container.innerHTML = '<p class="error-text">Không tải được danh sách: ' + escapeHtml(e.message) + '</p>';
+    }
+  }
+
   function bindAdmin() {
     const loginBox = document.getElementById('loginBox');
     const adminPanel = document.getElementById('adminPanel');
@@ -665,6 +779,7 @@
         loginBox.classList.add('hidden');
         adminPanel.classList.remove('hidden');
         refreshStats();
+        loadLinkList();
         setInterval(refreshStats, 5000);
       } else {
         loginError.classList.remove('hidden');
@@ -674,29 +789,72 @@
       if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
     });
 
-    document.getElementById('initLinksBtn').addEventListener('click', async function () {
-      const raw = document.getElementById('linksInput').value;
+    document.getElementById('addLinksBtn').addEventListener('click', async function () {
+      const raw = document.getElementById('addLinksInput').value;
       const lines = raw.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
       if (lines.length === 0) { alert('Vui lòng nhập ít nhất một link.'); return; }
-      if (!confirm('Khởi tạo ' + lines.length + ' rương mới? Toàn bộ rương và lượt nhận cũ sẽ bị xoá.')) return;
 
-      const btn = document.getElementById('initLinksBtn');
+      const btn = document.getElementById('addLinksBtn');
       btn.disabled = true;
       const original = btn.textContent;
-      btn.textContent = 'Đang xử lý…';
+      btn.textContent = 'Đang thêm…';
       try {
+        const pool = (await fbGet('linkPool')) || {};
+        let maxIdx = -1;
+        Object.keys(pool).forEach(function (k) {
+          const n = linkIndexOf(k);
+          if (n > maxIdx) maxIdx = n;
+        });
         const updates = {};
-        lines.forEach(function (url, i) { updates['l' + i] = { url: url, used: false }; });
-        await fbPut('linkPool', updates);
-        await fbDelete('dailyClaims');
-        document.getElementById('linksInput').value = '';
-        alert('Đã khởi tạo ' + lines.length + ' rương.');
+        lines.forEach(function (url, i) { updates['l' + (maxIdx + 1 + i)] = { url: url, used: false }; });
+        await fbPatch('linkPool', updates);
+        document.getElementById('addLinksInput').value = '';
+        alert('Đã thêm ' + lines.length + ' rương mới vào kho.');
         refreshStats();
+        loadLinkList();
       } catch (e) {
         alert('Lỗi: ' + e.message);
       } finally {
         btn.disabled = false;
         btn.textContent = original;
+      }
+    });
+
+    document.getElementById('refreshListBtn').addEventListener('click', loadLinkList);
+
+    document.getElementById('linkListContainer').addEventListener('click', async function (e) {
+      const row = e.target.closest('.link-row-admin');
+      if (!row) return;
+      const key = row.getAttribute('data-key');
+
+      if (e.target.classList.contains('save-link-btn')) {
+        const input = row.querySelector('.link-url-input');
+        const newUrl = input.value.trim();
+        if (!newUrl) { alert('Link không được để trống.'); return; }
+        e.target.disabled = true;
+        const original = e.target.textContent;
+        e.target.textContent = 'Đang lưu…';
+        try {
+          const current = (await fbGet('linkPool/' + key)) || {};
+          await fbPut('linkPool/' + key, Object.assign({}, current, { url: newUrl }));
+          e.target.textContent = 'Đã lưu ✓';
+          setTimeout(function () { e.target.textContent = original; e.target.disabled = false; }, 1200);
+        } catch (err) {
+          alert('Lỗi: ' + err.message);
+          e.target.disabled = false;
+          e.target.textContent = original;
+        }
+      } else if (e.target.classList.contains('delete-link-btn')) {
+        if (!confirm('Xoá rương #' + (linkIndexOf(key) + 1) + ' khỏi kho? Không thể hoàn tác.')) return;
+        e.target.disabled = true;
+        try {
+          await fbDelete('linkPool/' + key);
+          row.remove();
+          refreshStats();
+        } catch (err) {
+          alert('Lỗi: ' + err.message);
+          e.target.disabled = false;
+        }
       }
     });
 
@@ -707,6 +865,7 @@
         await fbDelete('dailyClaims');
         alert('Đã xoá toàn bộ dữ liệu.');
         refreshStats();
+        loadLinkList();
       } catch (e) {
         alert('Lỗi: ' + e.message);
       }
