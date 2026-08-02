@@ -68,10 +68,31 @@
     pointer-events: none;
   }
 
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(1px);
+    pointer-events: none;
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .orb-1 { width: 6px; height: 6px; background: var(--cyan); top: 18%; left: 12%; box-shadow: 0 0 12px 2px var(--cyan); animation: orbDrift 9s ease-in-out infinite; }
+  .orb-2 { width: 4px; height: 4px; background: var(--magenta); top: 68%; left: 84%; box-shadow: 0 0 10px 2px var(--magenta); animation: orbDrift 11s ease-in-out infinite -3s; }
+  .orb-3 { width: 5px; height: 5px; background: var(--gold); top: 78%; left: 20%; box-shadow: 0 0 10px 2px var(--gold); animation: orbDrift 13s ease-in-out infinite -6s; }
+  .orb-4 { width: 3px; height: 3px; background: var(--purple); top: 10%; left: 78%; box-shadow: 0 0 10px 2px var(--purple); animation: orbDrift 8s ease-in-out infinite -2s; }
+  @keyframes orbDrift {
+    0%, 100% { transform: translate(0,0); opacity: 0.35; }
+    50% { transform: translate(14px,-22px); opacity: 0.85; }
+  }
+
   .view { width: 100%; max-width: 460px; position: relative; z-index: 1; }
   .hidden { display: none !important; }
 
-  .booth { text-align: center; }
+  .booth { text-align: center; animation: boothIn .7s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes boothIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   .eyebrow {
     display: inline-block;
@@ -125,7 +146,14 @@
   }
 
   /* Crate visual */
-  .crate { width: 128px; height: 128px; margin: 4px auto 24px; }
+  .crate { width: 128px; height: 128px; margin: 4px auto 24px; position: relative; }
+  .crate-ring {
+    position: absolute; inset: -14px;
+    border-radius: 30px;
+    border: 1px solid rgba(63,243,255,0.35);
+    opacity: 0;
+    pointer-events: none;
+  }
   .crate-box {
     width: 100%; height: 100%;
     border-radius: 22px;
@@ -137,17 +165,57 @@
       0 18px 40px rgba(0,0,0,0.5);
     display: flex; align-items: center; justify-content: center;
     font-size: 3rem;
+    position: relative;
     animation: crateFloat 3s ease-in-out infinite;
+    transition: box-shadow .3s ease;
   }
+  .crate-box::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.16) 45%, transparent 60%);
+    background-size: 240% 240%;
+    background-position: 120% 0;
+    transition: background-position .8s ease;
+  }
+  .crate:hover .crate-box:not(.opening)::after { background-position: -20% 0; }
   @keyframes crateFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
   }
-  .crate-box.opening { animation: crateShake 0.45s ease-in-out infinite; }
+  .crate-box.opening {
+    animation: crateShake 0.32s cubic-bezier(.36,.07,.19,.97) infinite;
+    box-shadow:
+      0 0 0 1px rgba(255,62,192,0.25) inset,
+      0 0 54px rgba(63,243,255,0.5),
+      0 18px 40px rgba(0,0,0,0.5);
+  }
   @keyframes crateShake {
     0%, 100% { transform: translate(0,0) rotate(0deg); }
     25% { transform: translate(-3px,0) rotate(-3deg); }
     75% { transform: translate(3px,0) rotate(3deg); }
+  }
+  .crate-box.opening ~ .crate-ring,
+  .crate.bursting .crate-ring {
+    animation: ringPulse 0.6s ease-out infinite;
+  }
+  @keyframes ringPulse {
+    0% { opacity: 0.7; transform: scale(0.9); }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+
+  /* Reveal burst particles */
+  .confetti-piece {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 10px;
+    border-radius: 2px;
+    pointer-events: none;
+    animation: confettiFly .9s cubic-bezier(.16,.84,.44,1) forwards;
+  }
+  @keyframes confettiFly {
+    0% { transform: translate(-50%,-50%) rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)) scale(0.4); opacity: 0; }
   }
 
   .draw-btn {
@@ -191,6 +259,28 @@
   @keyframes rewardReveal {
     from { opacity: 0; transform: translateY(16px) scale(.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .reward-panel::before {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(120deg, var(--cyan), var(--magenta), var(--gold), var(--cyan));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .reward-panel.show::before {
+    opacity: 1;
+    animation: shimmerSweep 2.4s ease-in-out 1;
+  }
+  @keyframes shimmerSweep {
+    0% { background-position: 0% 50%; opacity: 1; }
+    70% { background-position: 100% 50%; opacity: 1; }
+    100% { background-position: 100% 50%; opacity: 0; }
   }
   .reward-eyebrow {
     font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.12em;
@@ -349,12 +439,31 @@
       transition-duration: 0.001ms !important;
     }
   }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  .hud-count-pop { animation: countPop .3s ease; }
+  @keyframes countPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.18); color: var(--cyan); }
+    100% { transform: scale(1); }
+  }
 </style>
 </head>
 <body>
 <div class="stage">
   <div class="scanlines" aria-hidden="true"></div>
   <div class="bg-grid" aria-hidden="true"></div>
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
+  <div class="orb orb-4" aria-hidden="true"></div>
 
   <main id="publicView" class="view">
     <div class="booth">
@@ -368,6 +477,7 @@
       </div>
 
       <div class="crate" id="crateVisual" aria-hidden="true">
+        <div class="crate-ring"></div>
         <div class="crate-box" id="crateBox">🎁</div>
       </div>
 
@@ -597,9 +707,49 @@
   const hudCount = document.getElementById('hudCount');
   const hudFill = document.getElementById('hudFill');
 
+  const celebrationAudio = new Audio('https://united866.github.io/TAT-CA-GAME-HACK/congratulations.mp3');
+  celebrationAudio.preload = 'auto';
+  function playCelebrationSound() {
+    try {
+      celebrationAudio.currentTime = 0;
+      const p = celebrationAudio.play();
+      if (p && p.catch) p.catch(function () { /* trình duyệt chặn tự phát, bỏ qua */ });
+    } catch (e) { /* bỏ qua nếu trình duyệt chặn */ }
+  }
+
   function setStatus(msg, isError) {
     statusText.textContent = msg || '';
     statusText.classList.toggle('error', !!isError);
+  }
+
+  function fireConfetti(originEl) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#3FF3FF', '#FF3FC0', '#FFC94A', '#7B4DFF'];
+    const rect = originEl.getBoundingClientRect();
+    const layer = document.createElement('div');
+    layer.style.position = 'fixed';
+    layer.style.left = rect.left + 'px';
+    layer.style.top = rect.top + 'px';
+    layer.style.width = rect.width + 'px';
+    layer.style.height = rect.height + 'px';
+    layer.style.zIndex = '999';
+    layer.style.pointerEvents = 'none';
+    document.body.appendChild(layer);
+
+    const count = 22;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const dist = 60 + Math.random() * 70;
+      piece.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      piece.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      piece.style.setProperty('--rot', (Math.random() * 360 - 180) + 'deg');
+      piece.style.background = colors[i % colors.length];
+      piece.style.animationDelay = (Math.random() * 0.06) + 's';
+      layer.appendChild(piece);
+    }
+    setTimeout(function () { layer.remove(); }, 1100);
   }
 
   async function refreshHud() {
@@ -609,7 +759,13 @@
       const total = keys.length;
       const used = keys.filter(function (k) { return pool[k] && pool[k].used; }).length;
       const left = total - used;
-      hudCount.textContent = left + ' / ' + total;
+      const newText = left + ' / ' + total;
+      if (hudCount.textContent !== newText && hudCount.textContent !== '–') {
+        hudCount.classList.remove('hud-count-pop');
+        void hudCount.offsetWidth;
+        hudCount.classList.add('hud-count-pop');
+      }
+      hudCount.textContent = newText;
       hudFill.style.width = total > 0 ? (Math.max(0, (left / total) * 100) + '%') : '0%';
     } catch (e) {
       hudCount.textContent = '—';
@@ -697,6 +853,8 @@
   claimBtn.addEventListener('click', async function () {
     claimBtn.disabled = true;
     crateBox.classList.add('opening');
+    fireConfetti(crateVisual);
+    playCelebrationSound();
     const originalLabel = claimBtn.textContent;
     claimBtn.textContent = 'Đang mở…';
     setStatus('');
